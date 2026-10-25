@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "Navigation/PathFollowingComponent.h"
 #include "GhostAIController.generated.h"
 
 /**
@@ -28,4 +29,15 @@ protected:
 	virtual void BeginPlay() override;
 
 	FTimerHandle ChaseTimerHandle;
+
+	UPROPERTY(EditInstanceOnly, Category = "Patrol") //adding ghost patrolling logic
+	TArray<AActor*> PatrolPoints;
+
+	int32 currentPatrolIndex = 0;
+
+	bool bIsChasing = false;
+
+	void MoveToNextPatrolPoint();
+
+	virtual void OnMoveCompleted(FAIRequestID RequestID, const FPathFollowingResult& Result) override;
 };

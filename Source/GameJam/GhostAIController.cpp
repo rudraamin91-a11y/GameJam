@@ -6,6 +6,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
 #include "Perception/AIPerceptionComponent.h"
+#include "Engine/TargetPoint.h"
 
 AGhostAIController::AGhostAIController()
 {
@@ -38,36 +39,80 @@ void AGhostAIController::UpdateChase() {
 	}
 }
 
-void AGhostAIController::OnTargetDetected(AActor* Actor, FAIStimulus stimulus) {
-	
-	if (!Actor || !Actor->IsA(ACharacter::StaticClass())) {
+void AGhostAIController::OnTargetDetected(
+	AActor* Actor,
+	FAIStimulus Stimulus)
+{
+	if (!Actor || Actor == GetPawn())
+	{
 		return;
 	}
 
-	if (stimulus.WasSuccessfullySensed()) {
+	ACharacter* Player =
+		UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+
+	if (Actor != Player)
+	{
+		return;
+	}
+
+	if (Stimulus.WasSuccessfullySensed())
+	{
+		bIsChasing = true;
 
 		UpdateChase();
 
-		GetWorldTimerManager().SetTimer(ChaseTimerHandle, this, &AGhostAIController::UpdateChase, 0.5f, true);
-		
+		GetWorldTimerManager().SetTimer(
+			ChaseTimerHandle,
+			this,
+			&AGhostAIController::UpdateChase,
+			0.5f,
+			true
+		);
 	}
-	else {
+	else
+	{
+		bIsChasing = false;
+
 		GetWorldTimerManager().ClearTimer(ChaseTimerHandle);
+
+		MoveToNextPatrolPoint();
 	}
 }
 
 void AGhostAIController::BeginPlay() {
 	Super::BeginPlay();
 
-	UE_LOG(LogTemp, Warning, TEXT("Ghost AI Controller started"));
+	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ATargetPoint::StaticClass(), PatrolPoints);
 
-	if (GetPawn())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Ghost is possessed"));
+	if (PatrolPoints.Num() > 0) {
+		MoveToNextPatrolPoint();
 	}
-	else
+}
+
+void AGhostAIController::MoveToNextPatrolPoint() {
+	if (PatrolPoints.Num() == 0) {
+		return;
+	}
+
+	AActor* target = PatrolPoints[currentPatrolIndex];
+
+	if (target) {
+		MoveToActor(target, 50.0f);
+	}
+
+	currentPatrolIndex = (currentPatrolIndex + 1) % PatrolPoints.Num();
+}
+
+void AGhostAIController::OnMoveCompleted(
+	FAIRequestID RequestID,
+	const FPathFollowingResult& Result)
+{
+	Super::OnMoveCompleted(RequestID, Result);
+
+	if (!bIsChasing && Result.IsSuccess())
 	{
-		UE_LOG(LogTemp, Error, TEXT("Ghost is NOT possessed"));
+		MoveToNextPatrolPoint();
 	}
 }
 
