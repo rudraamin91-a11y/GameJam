@@ -76,6 +76,8 @@ void AGhostAIController::OnTargetDetected(
 
 		GetWorldTimerManager().ClearTimer(ChaseTimerHandle);
 
+		StopMovement();
+
 		MoveToNextPatrolPoint();
 	}
 }
@@ -84,6 +86,9 @@ void AGhostAIController::BeginPlay() {
 	Super::BeginPlay();
 
 	UGameplayStatics::GetAllActorsOfClass(GetWorld(), ATargetPoint::StaticClass(), PatrolPoints);
+
+	UE_LOG(LogTemp, Warning, TEXT("Patrol points: %d"),
+		PatrolPoints.Num());
 
 	if (PatrolPoints.Num() > 0) {
 		MoveToNextPatrolPoint();
@@ -98,6 +103,10 @@ void AGhostAIController::MoveToNextPatrolPoint() {
 	AActor* target = PatrolPoints[currentPatrolIndex];
 
 	if (target) {
+
+		UE_LOG(LogTemp, Warning, TEXT("Moving to patrol point: %s"),
+			*target->GetName());
+
 		MoveToActor(target, 50.0f);
 	}
 
@@ -109,6 +118,9 @@ void AGhostAIController::OnMoveCompleted(
 	const FPathFollowingResult& Result)
 {
 	Super::OnMoveCompleted(RequestID, Result);
+
+	UE_LOG(LogTemp, Warning, TEXT("Move result: %s"),
+		*UEnum::GetValueAsString(Result.Code));
 
 	if (!bIsChasing && Result.IsSuccess())
 	{
