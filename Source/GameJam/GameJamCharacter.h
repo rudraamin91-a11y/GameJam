@@ -48,11 +48,21 @@ protected:
 	/** Mouse Look Input Action */
 	UPROPERTY(EditAnywhere, Category ="Input")
 	class UInputAction* MouseLookAction;
+
+	//Interact input action
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowedPrivateAccess = "true"))
+	UInputAction* InteractAction;
 	
 public:
 	AGameJamCharacter();
 
+	UFUNCTION()
+	void respawnPlayer(); //respawming the player
+
 protected:
+	 
+	// Interact with doors/cupboards
+	void Interact();
 
 	/** Called from Input Actions for movement input */
 	void MoveInput(const FInputActionValue& Value);

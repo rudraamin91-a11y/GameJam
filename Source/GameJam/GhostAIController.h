@@ -30,7 +30,7 @@ protected:
 
 	FTimerHandle ChaseTimerHandle;
 
-	UPROPERTY(EditInstanceOnly, Category = "Patrol") //adding ghost patrolling logic
+	UPROPERTY(EditInstanceOnly, Category = "Patrol") 
 	TArray<AActor*> PatrolPoints;
 
 	int32 currentPatrolIndex = 0;

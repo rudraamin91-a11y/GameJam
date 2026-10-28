@@ -7,6 +7,7 @@
 #include "GameFramework/Character.h"
 #include "Perception/AIPerceptionComponent.h"
 #include "Engine/TargetPoint.h"
+#include "GameJamCharacter.h"
 
 AGhostAIController::AGhostAIController()
 {
@@ -32,26 +33,45 @@ AGhostAIController::AGhostAIController()
 }
 
 void AGhostAIController::UpdateChase() {
-	ACharacter* Player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
+	ACharacter* player = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 
-	if (Player) {
-		MoveToActor(Player, 150.0f);
+	APawn* ghost = GetPawn();
+
+	if (!player || !ghost) {
+		return;
 	}
+
+	const float distance = FVector::Dist(ghost->GetActorLocation(), player->GetActorLocation());
+
+	if (distance <= 300.0f) {
+		AGameJamCharacter* gamePlayer = Cast<AGameJamCharacter>(player);
+
+		if (gamePlayer) {
+			GetWorldTimerManager().ClearTimer(ChaseTimerHandle);
+			bIsChasing = false;
+			StopMovement();
+
+			gamePlayer->respawnPlayer();
+
+			MoveToNextPatrolPoint();
+			return;
+		}
+	}
+
+		MoveToActor(player, 150.0f);
 }
 
-void AGhostAIController::OnTargetDetected(
-	AActor* Actor,
-	FAIStimulus Stimulus)
+void AGhostAIController::OnTargetDetected(AActor* Actor, FAIStimulus Stimulus)
 {
 	if (!Actor || Actor == GetPawn())
 	{
 		return;
 	}
 
-	ACharacter* Player =
+	ACharacter* player =
 		UGameplayStatics::GetPlayerCharacter(GetWorld(), 0);
 
-	if (Actor != Player)
+	if (Actor != player)
 	{
 		return;
 	}
@@ -62,13 +82,7 @@ void AGhostAIController::OnTargetDetected(
 
 		UpdateChase();
 
-		GetWorldTimerManager().SetTimer(
-			ChaseTimerHandle,
-			this,
-			&AGhostAIController::UpdateChase,
-			0.5f,
-			true
-		);
+		GetWorldTimerManager().SetTimer(ChaseTimerHandle,this, &AGhostAIController::UpdateChase, 0.5f, true);
 	}
 	else
 	{
@@ -119,8 +133,7 @@ void AGhostAIController::OnMoveCompleted(
 {
 	Super::OnMoveCompleted(RequestID, Result);
 
-	UE_LOG(LogTemp, Warning, TEXT("Move result: %s"),
-		*UEnum::GetValueAsString(Result.Code));
+	UE_LOG(LogTemp, Warning, TEXT("Move result: %s"), *UEnum::GetValueAsString(Result.Code));
 
 	if (!bIsChasing && Result.IsSuccess())
 	{

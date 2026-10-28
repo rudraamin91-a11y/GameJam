@@ -1,14 +1,21 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "GameJamCharacter.h"
+#include "Engine/OverlapResult.h"
+#include "EngineUtils.h"
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Components/StaticMeshComponent.h"
 #include "EnhancedInputComponent.h"
 #include "InputActionValue.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "GameFramework/PlayerStart.h"
 #include "GameJam.h"
+#include "DrawerActor.h"
+#include "Engine/TargetPoint.h"
+#include <Kismet/GameplayStatics.h>
 
 AGameJamCharacter::AGameJamCharacter()
 {
@@ -59,6 +66,9 @@ void AGameJamCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 		// Looking/Aiming
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AGameJamCharacter::LookInput);
 		EnhancedInputComponent->BindAction(MouseLookAction, ETriggerEvent::Triggered, this, &AGameJamCharacter::LookInput);
+
+		//Interacting
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &AGameJamCharacter::Interact);
 	}
 	else
 	{
@@ -117,4 +127,81 @@ void AGameJamCharacter::DoJumpEnd()
 {
 	// pass StopJumping to the character
 	StopJumping();
+}
+
+void AGameJamCharacter::Interact()
+{
+
+	UE_LOG(LogTemp, Warning, TEXT("F pressed - Interact called"));
+	FVector start = FirstPersonCameraComponent->GetComponentLocation();
+
+	FVector end = start + FirstPersonCameraComponent->GetForwardVector() * 500.0f;
+
+	FHitResult Hit;
+
+	FCollisionQueryParams QueryParams;
+	QueryParams.AddIgnoredActor(this);
+
+	bool ifHit = GetWorld()->LineTraceSingleByChannel(Hit, start, end, ECC_Visibility, QueryParams);
+
+	if (!ifHit)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Line trace hit nothing"));
+		return;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("Hit actor: %s"),
+		*GetNameSafe(Hit.GetActor()));
+
+	UE_LOG(LogTemp, Warning, TEXT("Hit component: %s"),
+		*GetNameSafe(Hit.GetComponent()));
+
+	ADrawerActor* drawer = Cast<ADrawerActor>(Hit.GetActor());
+
+
+	/*if (ifHit) {
+		ADrawerActor* drawer = Cast<ADrawerActor>(Hit.GetActor());
+
+		if (drawer) {
+			UStaticMeshComponent* HitDrawer = Cast<UStaticMeshComponent>(Hit.GetComponent());
+
+			if (HitDrawer) {
+				drawer->ToggleDrawer(HitDrawer);
+			}
+		} 
+	}*/
+
+	if (!drawer)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Hit actor is not a DrawerActor"));
+		return;
+	}
+
+	UStaticMeshComponent* HitDrawer =
+		Cast<UStaticMeshComponent>(Hit.GetComponent());
+
+	if (HitDrawer)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Calling ToggleDrawer"));
+		drawer->ToggleDrawer(HitDrawer);
+	}
+}
+
+void AGameJamCharacter::respawnPlayer() {
+	
+	AActor* PlayerStart = UGameplayStatics::GetActorOfClass(GetWorld(), APlayerStart::StaticClass());
+
+	if (PlayerStart) {
+		SetActorLocation(PlayerStart->GetActorLocation());
+		SetActorRotation(PlayerStart->GetActorRotation());
+
+		UE_LOG(LogTemp, Warning, TEXT("Player respawned at PlayerStart!"));
+
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("PlayerStart not found!"));
+	}
+		
+
+	UE_LOG(LogTemp, Error, TEXT("PlayerRespawnPoint not found!"));
 }
