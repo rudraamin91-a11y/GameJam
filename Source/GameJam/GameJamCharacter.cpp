@@ -13,6 +13,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerStart.h"
 #include "GameJam.h"
+#include "KeyPickup.h"
 #include "DrawerActor.h"
 #include "Engine/TargetPoint.h"
 #include <Kismet/GameplayStatics.h>
@@ -69,6 +70,8 @@ void AGameJamCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCo
 
 		//Interacting
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &AGameJamCharacter::Interact);
+
+		EnhancedInputComponent->BindAction(PickupAction, ETriggerEvent::Started, this, &AGameJamCharacter::pickupKey);
 	}
 	else
 	{
@@ -131,6 +134,16 @@ void AGameJamCharacter::DoJumpEnd()
 
 void AGameJamCharacter::Interact()
 {
+
+	if (keyNearby) {
+
+		UE_LOG(LogTemp, Warning, TEXT("Key picked up!"));
+
+		keyNearby->Destroy();
+		keyNearby = nullptr;
+
+		return;
+	}
 
 	UE_LOG(LogTemp, Warning, TEXT("F pressed - Interact called"));
 	FVector start = FirstPersonCameraComponent->GetComponentLocation();
@@ -204,4 +217,26 @@ void AGameJamCharacter::respawnPlayer() {
 		
 
 	UE_LOG(LogTemp, Error, TEXT("PlayerRespawnPoint not found!"));
+}
+
+void AGameJamCharacter::pickupKey() {
+
+	if (!keyNearby) {
+		return; //ends the function if player press R when key is not detected
+	}
+
+	if (keyNearby->IsSkullKey) {
+
+		hasSkullKey = true;
+		UE_LOG(LogTemp, Warning, TEXT("Skull key added.."));
+
+	}
+	else {
+		hasRegularKey = true;
+		UE_LOG(LogTemp, Warning, TEXT("Regular key added.."));
+	}
+	
+
+	keyNearby->Destroy();
+	keyNearby = nullptr;
 }

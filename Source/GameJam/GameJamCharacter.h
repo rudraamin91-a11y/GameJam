@@ -18,6 +18,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 /**
  *  A basic first person character
  */
+class AKeyPickup;
 UCLASS(abstract)
 class AGameJamCharacter : public ACharacter
 {
@@ -30,6 +31,12 @@ class AGameJamCharacter : public ACharacter
 	/** First person camera */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category="Components", meta = (AllowPrivateAccess = "true"))
 	UCameraComponent* FirstPersonCameraComponent;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
+	bool hasRegularKey = false;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
+	bool hasSkullKey = false;
 
 protected:
 
@@ -52,9 +59,17 @@ protected:
 	//Interact input action
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowedPrivateAccess = "true"))
 	UInputAction* InteractAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Input", meta = (AllowedPrivateAccess = "true"))
+	UInputAction* PickupAction;
+
+	UPROPERTY()
+	AKeyPickup* keyNearby;
 	
 public:
 	AGameJamCharacter();
+
+	friend class AKeyPickup;
 
 	UFUNCTION()
 	void respawnPlayer(); //respawming the player
@@ -63,6 +78,8 @@ protected:
 	 
 	// Interact with doors/cupboards
 	void Interact();
+
+	void pickupKey(); //pickup key
 
 	/** Called from Input Actions for movement input */
 	void MoveInput(const FInputActionValue& Value);
