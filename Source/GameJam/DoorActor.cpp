@@ -5,15 +5,14 @@
 #include "Kismet/GameplayStatics.h"
 #include "Components/StaticMeshComponent.h"
 
-// Sets default values
 ADoorActor::ADoorActor()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+ 	//Set this actor to call Tick() every frame.
 	PrimaryActorTick.bCanEverTick = true;
 
 }
 
-// Called when the game starts or when spawned
+//Called when the game starts or when spawned
 void ADoorActor::BeginPlay()
 {
 	Super::BeginPlay();
@@ -47,7 +46,7 @@ void ADoorActor::BeginPlay()
 	
 }
 
-// Called every frame
+//Called every frame
 void ADoorActor::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

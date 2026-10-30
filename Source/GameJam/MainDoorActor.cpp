@@ -13,7 +13,7 @@ void AMainDoorActor::BeginPlay()
 {
     Super::BeginPlay();
 
-    // Find the components created in BP_MainDoor
+    
     TArray<UStaticMeshComponent*> MeshComponents;
     GetComponents<UStaticMeshComponent>(MeshComponents);
 
@@ -26,7 +26,6 @@ void AMainDoorActor::BeginPlay()
 
         const FString ComponentName = Mesh->GetName();
 
-        UE_LOG(LogTemp, Warning, TEXT("Main Door Component: %s"), *ComponentName);
 
         if (ComponentName.Contains(TEXT("leftDoor")))
         {
@@ -46,7 +45,7 @@ void AMainDoorActor::BeginPlay()
         }
     }
 
-    // Store the original door rotations
+    //Stored the original door rotations
     if (LeftDoorMesh)
     {
         LeftClosedRotation = LeftDoorMesh->GetRelativeRotation();
@@ -56,14 +55,12 @@ void AMainDoorActor::BeginPlay()
     if (RightDoorMesh)
     {
         RightClosedRotation = RightDoorMesh->GetRelativeRotation();
-        RightOpenRotation = RightClosedRotation + FRotator(0.0f, 90.0f, 0.0f);
-    }
+        RightClosedLocation = RightDoorMesh->GetRelativeLocation();
 
-    // Report whether all components were found
-    UE_LOG(LogTemp, Warning, TEXT("Left Door: %s"), *GetNameSafe(LeftDoorMesh));
-    UE_LOG(LogTemp, Warning, TEXT("Right Door: %s"), *GetNameSafe(RightDoorMesh));
-    UE_LOG(LogTemp, Warning, TEXT("Key Lock: %s"), *GetNameSafe(KeyLockMesh));
-    UE_LOG(LogTemp, Warning, TEXT("Skull Lock: %s"), *GetNameSafe(SkullLockMesh));
+        RightOpenLocation = FVector(110.0f, 0.0f, 142.509f);
+        RightOpenRotation = RightClosedRotation + FRotator(0.0f, 90.0f, 0.0f);
+
+    }
 }
 
 void AMainDoorActor::Tick(float DeltaTime)
@@ -75,7 +72,7 @@ void AMainDoorActor::Tick(float DeltaTime)
         return;
     }
 
-    // Smoothly rotate both door panels
+    //smoothly rotate both door panels
     if (LeftDoorMesh)
     {
         FRotator NewRotation = FMath::RInterpTo(LeftDoorMesh->GetRelativeRotation(), LeftOpenRotation, DeltaTime, DoorRotationSpeed);
@@ -86,30 +83,32 @@ void AMainDoorActor::Tick(float DeltaTime)
     if (RightDoorMesh)
     {
         FRotator NewRotation = FMath::RInterpTo(RightDoorMesh->GetRelativeRotation(), RightOpenRotation, DeltaTime, DoorRotationSpeed);
+        FVector NewLocation = FMath::VInterpTo(RightDoorMesh->GetRelativeLocation(), RightOpenLocation, DeltaTime, DoorRotationSpeed);
 
         RightDoorMesh->SetRelativeRotation(NewRotation);
+        RightDoorMesh->SetRelativeLocation(NewLocation);
     }
 }
 
-void AMainDoorActor::InteractWithDoor(bool bHasRegularKey, bool bHasSkullKey)
+void AMainDoorActor::InteractWithDoor(bool& HasRegularKey, bool& HasSkullKey)
 {
 
-    if (!bKeyLockUnlocked && bHasRegularKey)
+    if (!bKeyLockUnlocked && HasRegularKey)
     {
         bKeyLockUnlocked = true;
+        HasRegularKey = false;
 
         if (KeyLockMesh)
         {
             KeyLockMesh->SetVisibility(false);
             KeyLockMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
         }
-        UE_LOG(LogTemp, Warning, TEXT("Regular key lock unlocked!"));
     }
 
-
-    else if (!bSkullLockUnlocked && bHasSkullKey)
+    else if (!bSkullLockUnlocked && HasSkullKey)
     {
         bSkullLockUnlocked = true;
+        HasSkullKey = false;
 
         if (SkullLockMesh)
         {
@@ -117,17 +116,15 @@ void AMainDoorActor::InteractWithDoor(bool bHasRegularKey, bool bHasSkullKey)
             SkullLockMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
         }
 
-        UE_LOG(LogTemp, Warning, TEXT("Skull lock unlocked!"));
     }
     else
     {
-        UE_LOG(LogTemp, Warning, TEXT("You don't have the required key!"));
+        return;
     }
 
     if (bKeyLockUnlocked && bSkullLockUnlocked && !bDoorIsOpen)
     {
         bDoorIsOpen = true;
-        UE_LOG(LogTemp, Warning, TEXT("Both locks unlocked! Opening main door."));
     }
 }
 

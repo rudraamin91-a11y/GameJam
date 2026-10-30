@@ -17,7 +17,7 @@ public:
 
     virtual void Tick(float DeltaTime) override;
 
-    void InteractWithDoor(bool bHasRegularKey, bool bHasSkullKey);
+    void InteractWithDoor(bool& bHasRegularKey, bool& bHasSkullKey);
 
 protected:
     virtual void BeginPlay() override;
@@ -41,6 +41,9 @@ private:
 
     FRotator LeftOpenRotation;
     FRotator RightOpenRotation;
+
+    FVector RightOpenLocation;
+    FVector RightClosedLocation;
 
     float DoorRotationSpeed = 3.0f;
 };
