@@ -16,6 +16,7 @@
 #include "Blueprint/UserWidget.h"
 #include "KeyPickup.h"
 #include "DrawerActor.h"
+#include "DoorActor.h"
 #include "Engine/TargetPoint.h"
 #include <Kismet/GameplayStatics.h>
 
@@ -59,6 +60,7 @@ void AGameJamCharacter::BeginPlay()
 
 	if (inventoryWidgetClass)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Inventory Widget Class assigned"));
 		inventoryWidget = CreateWidget<UUserWidget>(
 			GetWorld(),
 			inventoryWidgetClass
@@ -67,7 +69,14 @@ void AGameJamCharacter::BeginPlay()
 		if (inventoryWidget)
 		{
 			inventoryWidget->AddToViewport();
+			UE_LOG(LogTemp, Warning, TEXT("Inventory Widget added to viewport"));
 		}
+		else {
+			UE_LOG(LogTemp, Error, TEXT("Inventory Widget creation failed"));
+		}
+	}
+	else {
+		UE_LOG(LogTemp, Error, TEXT("InventoryWidgetClass is NULL"));
 	}
 }
 
@@ -154,17 +163,8 @@ void AGameJamCharacter::DoJumpEnd()
 void AGameJamCharacter::Interact()
 {
 
-	if (keyNearby) {
-
-		UE_LOG(LogTemp, Warning, TEXT("Key picked up!"));
-
-		keyNearby->Destroy();
-		keyNearby = nullptr;
-
-		return;
-	}
-
 	UE_LOG(LogTemp, Warning, TEXT("F pressed - Interact called"));
+
 	FVector start = FirstPersonCameraComponent->GetComponentLocation();
 
 	FVector end = start + FirstPersonCameraComponent->GetForwardVector() * 500.0f;
@@ -188,8 +188,20 @@ void AGameJamCharacter::Interact()
 	UE_LOG(LogTemp, Warning, TEXT("Hit component: %s"),
 		*GetNameSafe(Hit.GetComponent()));
 
-	ADrawerActor* drawer = Cast<ADrawerActor>(Hit.GetActor());
+	ADoorActor* door = Cast<ADoorActor>(Hit.GetActor());
 
+	if (door) {
+
+		UStaticMeshComponent* hitDoor = Cast<UStaticMeshComponent>(Hit.GetComponent());
+
+		if (hitDoor) {
+
+			UE_LOG(LogTemp, Warning, TEXT("Calling toggleDoor()"));
+			door->ToggleDoor(hitDoor);
+		}
+
+		return;
+	}
 
 	/*if (ifHit) {
 		ADrawerActor* drawer = Cast<ADrawerActor>(Hit.GetActor());
@@ -203,20 +215,25 @@ void AGameJamCharacter::Interact()
 		} 
 	}*/
 
-	if (!drawer)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Hit actor is not a DrawerActor"));
+	ADrawerActor* drawer = Cast<ADrawerActor>(Hit.GetActor());
+
+	if (drawer) {
+
+		UStaticMeshComponent* HitDrawer =
+			Cast<UStaticMeshComponent>(Hit.GetComponent());
+
+		UE_LOG(LogTemp, Warning, TEXT("Door cast result: %s"),
+			door ? TEXT("SUCCESS") : TEXT("FAILED"));
+
+		if (HitDrawer)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Calling ToggleDrawer"));
+			drawer->ToggleDrawer(HitDrawer);
+		}
 		return;
 	}
 
-	UStaticMeshComponent* HitDrawer =
-		Cast<UStaticMeshComponent>(Hit.GetComponent());
-
-	if (HitDrawer)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Calling ToggleDrawer"));
-		drawer->ToggleDrawer(HitDrawer);
-	}
+	UE_LOG(LogTemp, Warning, TEXT("Hit actor is neither a DoorActor nor DrawerActor"));
 }
 
 void AGameJamCharacter::respawnPlayer() {
@@ -239,6 +256,8 @@ void AGameJamCharacter::respawnPlayer() {
 }
 
 void AGameJamCharacter::pickupKey() {
+
+	UE_LOG(LogTemp, Warning, TEXT("PICKUP FUNCTION CALLED"));
 
 	if (!keyNearby) {
 		return; //ends the function if player press R when key is not detected

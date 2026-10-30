@@ -3,6 +3,7 @@
 
 #include "DrawerActor.h"
 #include "Components/StaticMeshComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "Math/UnrealMath.h"
 
 // Sets default values
@@ -51,9 +52,14 @@ void ADrawerActor::ToggleDrawer(UStaticMeshComponent* HitDrawer) {
 
 		if (drawer1IsOpen) {
 			Drawer1TargetLocation = Drawer1ClosedLocation + offset;
+
+			UGameplayStatics::PlaySoundAtLocation(this, drawerOpenSound, Drawer1->GetComponentLocation());
+			
 		}
 		else {
 			Drawer1TargetLocation = Drawer1ClosedLocation;
+
+			UGameplayStatics::PlaySoundAtLocation(this, drawerCloseSound, Drawer1->GetComponentLocation());
 		}
 	}
 	else if(HitDrawer == Drawer2) { //opening/closing 2nd drawer
@@ -63,12 +69,15 @@ void ADrawerActor::ToggleDrawer(UStaticMeshComponent* HitDrawer) {
 		if (drawer2IsOpen) {
 
 			Drawer2TargetLocation = Drawer2ClosedLocation + offset;
+
+			UGameplayStatics::PlaySoundAtLocation(this, drawerOpenSound, Drawer2->GetComponentLocation());
 		}
 		else {
 			Drawer2TargetLocation = Drawer2ClosedLocation;
+
+			UGameplayStatics::PlaySoundAtLocation(this, drawerCloseSound, Drawer2->GetComponentLocation());
 		}
 		
-		Drawer3TargetLocation = Drawer3ClosedLocation;
 	}
 	else if (HitDrawer == Drawer3) { //opening/closing 3rd drawer
 
@@ -77,9 +86,13 @@ void ADrawerActor::ToggleDrawer(UStaticMeshComponent* HitDrawer) {
 		if (drawer3IsOpen) {
 
 			Drawer3TargetLocation = Drawer3ClosedLocation + offset;
+			UGameplayStatics::PlaySoundAtLocation(this, drawerOpenSound, Drawer3->GetComponentLocation());
+
 		}
 		else {
 			Drawer3TargetLocation = Drawer3ClosedLocation;
+
+			UGameplayStatics::PlaySoundAtLocation(this, drawerCloseSound, Drawer3->GetComponentLocation());
 		}
 
 		
