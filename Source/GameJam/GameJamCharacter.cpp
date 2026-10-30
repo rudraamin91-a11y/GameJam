@@ -1,6 +1,7 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "GameJamCharacter.h"
+#include "MainDoorActor.h"
 #include "Engine/OverlapResult.h"
 #include "EngineUtils.h"
 #include "Animation/AnimInstance.h"
@@ -188,6 +189,24 @@ void AGameJamCharacter::Interact()
 	UE_LOG(LogTemp, Warning, TEXT("Hit component: %s"),
 		*GetNameSafe(Hit.GetComponent()));
 
+	UStaticMeshComponent* HitMesh =
+		Cast<UStaticMeshComponent>(Hit.GetComponent());
+
+	//main door
+	AMainDoorActor* MainDoor = Cast<AMainDoorActor>(Hit.GetActor());
+
+	if (MainDoor)
+	{
+		if (HitMesh)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Interacting with Main Door"));
+
+			MainDoor->InteractWithDoor(hasRegularKey,hasSkullKey);
+		}
+
+		return;
+	}
+
 	ADoorActor* door = Cast<ADoorActor>(Hit.GetActor());
 
 	if (door) {
@@ -222,8 +241,6 @@ void AGameJamCharacter::Interact()
 		UStaticMeshComponent* HitDrawer =
 			Cast<UStaticMeshComponent>(Hit.GetComponent());
 
-		UE_LOG(LogTemp, Warning, TEXT("Door cast result: %s"),
-			door ? TEXT("SUCCESS") : TEXT("FAILED"));
 
 		if (HitDrawer)
 		{

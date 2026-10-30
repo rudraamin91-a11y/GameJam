@@ -12,9 +12,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "GameJam", "Intermediate\Pro
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Visualizers", "Visualizers", "{1CCEC849-CC72-4C59-8C36-2F7C38706D4C}"
 	ProjectSection(SolutionItems) = preProject
-		..\..\..\UE_5.8\Engine\Extras\VisualStudioDebugging\Unreal.natjmc = ..\..\..\UE_5.8\Engine\Extras\VisualStudioDebugging\Unreal.natjmc
-		..\..\..\UE_5.8\Engine\Extras\VisualStudioDebugging\Unreal.natstepfilter = ..\..\..\UE_5.8\Engine\Extras\VisualStudioDebugging\Unreal.natstepfilter
-		..\..\..\UE_5.8\Engine\Extras\VisualStudioDebugging\Unreal.natvis = ..\..\..\UE_5.8\Engine\Extras\VisualStudioDebugging\Unreal.natvis
+		D:\UE_5.8\Engine\Extras\VisualStudioDebugging\Unreal.natvis = D:\UE_5.8\Engine\Extras\VisualStudioDebugging\Unreal.natvis
+		D:\UE_5.8\Engine\Extras\VisualStudioDebugging\Unreal.natstepfilter = D:\UE_5.8\Engine\Extras\VisualStudioDebugging\Unreal.natstepfilter
+		D:\UE_5.8\Engine\Extras\VisualStudioDebugging\Unreal.natjmc = D:\UE_5.8\Engine\Extras\VisualStudioDebugging\Unreal.natjmc
 	EndProjectSection
 EndProject
 Global
@@ -88,9 +88,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{15B5453D-E811-3978-97FC-4C747968D1B9} = {233774A8-CC9D-3FA9-86D1-90573E92B704}
 		{D26C13B3-9F33-382E-B240-9A7478589609} = {DE1F8B53-6C02-3C13-9101-A7C8D96F3FF6}
-	EndGlobalSection
-	GlobalSection(ExtensibilityGlobals) = postSolution
-		SolutionGuid = {C8D83CE2-0119-4CCF-A5D7-07A9AA71CB91}
 	EndGlobalSection
 	GlobalSection(ddbf523f-7eb6-4887-bd51-85a714ff87eb) = preSolution
 		AvailablePlatforms = Win64
