@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Sound/SoundBase.h"
 #include "DrawerActor.generated.h"
 
 UCLASS()
@@ -35,6 +36,12 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Drawer")
 	UStaticMeshComponent* Drawer3;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Drawer Sounds")
+	USoundBase* drawerOpenSound;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Drawer Sounds")
+	USoundBase* drawerCloseSound;
 
 
 private:
