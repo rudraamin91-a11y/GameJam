@@ -43,7 +43,7 @@ void AGhostAIController::UpdateChase() {
 
 	const float distance = FVector::Dist(ghost->GetActorLocation(), player->GetActorLocation());
 
-	if (distance <= 300.0f) {
+	if (distance <= 0.0f) {
 		AGameJamCharacter* gamePlayer = Cast<AGameJamCharacter>(player);
 
 		if (gamePlayer) {
