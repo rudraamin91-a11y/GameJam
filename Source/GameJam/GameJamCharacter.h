@@ -18,6 +18,7 @@ DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 /**
  *  A basic first person character
  */
+class UUserWidget;
 class AKeyPickup;
 UCLASS(abstract)
 class AGameJamCharacter : public ACharacter
@@ -37,6 +38,11 @@ class AGameJamCharacter : public ACharacter
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory", meta = (AllowPrivateAccess = "true"))
 	bool hasSkullKey = false;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Inventory UI")TSubclassOf<UUserWidget> inventoryWidgetClass;
+
+	UPROPERTY()
+	TObjectPtr<UUserWidget> inventoryWidget;
 
 protected:
 
@@ -73,6 +79,8 @@ public:
 
 	UFUNCTION()
 	void respawnPlayer(); //respawming the player
+
+	virtual void BeginPlay() override;
 
 protected:
 	 

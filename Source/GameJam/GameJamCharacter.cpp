@@ -13,6 +13,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/PlayerStart.h"
 #include "GameJam.h"
+#include "Blueprint/UserWidget.h"
 #include "KeyPickup.h"
 #include "DrawerActor.h"
 #include "Engine/TargetPoint.h"
@@ -50,6 +51,24 @@ AGameJamCharacter::AGameJamCharacter()
 	// Configure character movement
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 	GetCharacterMovement()->AirControl = 0.5f;
+}
+
+void AGameJamCharacter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	if (inventoryWidgetClass)
+	{
+		inventoryWidget = CreateWidget<UUserWidget>(
+			GetWorld(),
+			inventoryWidgetClass
+		);
+
+		if (inventoryWidget)
+		{
+			inventoryWidget->AddToViewport();
+		}
+	}
 }
 
 void AGameJamCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
