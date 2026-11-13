@@ -61,16 +61,11 @@ void AGameJamCharacter::BeginPlay()
 
 	if (inventoryWidgetClass)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Inventory Widget Class assigned"));
-		inventoryWidget = CreateWidget<UUserWidget>(
-			GetWorld(),
-			inventoryWidgetClass
-		);
+		inventoryWidget = CreateWidget<UUserWidget>(GetWorld(),inventoryWidgetClass);
 
 		if (inventoryWidget)
 		{
 			inventoryWidget->AddToViewport();
-			UE_LOG(LogTemp, Warning, TEXT("Inventory Widget added to viewport"));
 		}
 		else {
 			UE_LOG(LogTemp, Error, TEXT("Inventory Widget creation failed"));
